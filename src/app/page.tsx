@@ -1,18 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export default function Home() {
   const [isFlying, setIsFlying] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
 
-  const handleNoClick = () => {
-    setIsFlying(true);
-  };
+  useEffect(() => {
+    const sendAccessMessage = async () => {
+      await fetch("/api/send-to-telegram", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "ALERTTTT RACHEL ACCESSED THE PAGE",
+        }),
+      });
+    };
 
-  const handleYesClick = () => {
-    setIsConfirmed(true);
+    sendAccessMessage();
+  }, []);
+
+  const handleButtonClick = async (action: "Yes" | "No") => {
+    if (action === "No") {
+      setIsFlying(true);
+    } else if (action === "Yes") {
+      setIsConfirmed(true);
+    }
+
+    await fetch("/api/send-to-telegram", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: action === "Yes" ? "SHE SAID YES LFG" : "fk me",
+      }),
+    });
   };
 
   return (
@@ -34,7 +60,11 @@ export default function Home() {
         />
 
         <div className="list-inside list-decimal text-lg text-center font-[family-name:var(--font-geist-mono)]">
-          <p className="mb-2">{isConfirmed ? "cool bean see you on friday!!" : "want to paktor on valentine?"}</p>
+          <p className="mb-2">
+            {isConfirmed
+              ? "cool beans see you on friday!!"
+              : "want to paktor on valentine?"}
+          </p>
         </div>
 
         {!isConfirmed && (
@@ -57,19 +87,19 @@ export default function Home() {
 
             <div className="flex gap-4 items-center flex-col sm:flex-row absolute bottom-20">
               <button
-                onClick={handleYesClick}
-                className="rounded-full flex items-center justify-center bg-foreground text-background gap-2 text-lg h-10 px-4 min-w-80"
+                onClick={() => handleButtonClick("Yes")}
+                className="rounded-full flex items-center justify-center bg-stone-200 text-background gap-2 text-lg h-10 px-4 min-w-80"
               >
-                Yes
+                ✨Yes✨
               </button>
               <button
-                onClick={handleNoClick}
-                className={`rounded-full flex items-center justify-center bg-foreground text-background gap-2 text-xs h-10 px-4 min-w-80 transition-all ${
+                onClick={() => handleButtonClick("No")}
+                className={`rounded-full flex items-center justify-center bg-stone-200 text-background gap-2 text-xs h-10 px-4 min-w-80 transition-all ${
                   isFlying ? "animate-[var(--animate-fly-up)]" : ""
                 }`}
               >
-                No
-              </button> 
+                No 😔
+              </button>
             </div>
           </>
         )}
